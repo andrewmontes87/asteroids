@@ -1,4 +1,4 @@
-asteroids
+shmup
 =========
 built with coquette
 
