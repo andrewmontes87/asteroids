@@ -4,7 +4,7 @@ built with coquette
 
 http://coquette.maryrosecook.com/
 
-*gameplay:*
+**gameplay:**
 
 use the arrow keys to move and the space bar to shoot.
 
@@ -14,6 +14,6 @@ if an asteroid turns purple it's harder to kill.
 
 if you die the game starts over.
 
-*demo:*
+**demo:**
 
 http://andrewmontes.com/asteroids/
