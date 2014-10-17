@@ -17,7 +17,7 @@ var globals = {
   newGame: function(c) {
 
     while (c.entities.all().length) {
-      c.entities.destroy(c.entities.all()[0])
+      c.entities.destroy(c.entities.all()[0]);
     }
     globals.score = 0;
     document.getElementById('score').innerHTML = globals.score;
@@ -25,27 +25,13 @@ var globals = {
     // Create Player instance
     c.entities.create(Player, {
       center: {
-        x: globals.canvasWidth/2,
+        x: 20,
         y: globals.canvasHeight/2
       }
     });
     // Create AsteroidGenerator intance 
     c.entities.create(AsteroidGenerator, {});
 
-    // Create Asteroid instance
-    c.entities.create(Asteroid, { 
-      center: {
-        x: Math.random() * globals.canvasWidth,
-        y: Math.random() * globals.canvasHeight
-      },
-        vel: {
-        x: Math.random(),
-        y: Math.random()
-      },
-      angle: 0,
-      size : { x:20 , y:20 }, 
-      color:'magenta'
-    });
   }
 };
 
@@ -54,7 +40,7 @@ var Game = function() {
   // Create Game instance
   this.c = new Coquette(this, "canvas", globals.canvasWidth, globals.canvasHeight, globals.canvasBgcolor);
   globals.newGame(this.c);
-  
+
 };
 
 // Player class
@@ -74,8 +60,6 @@ var Player = function(game, settings) {
   };
   this.color = "blue";
   this.angle = 0;
-  this.angle_vel = 0;
-  this.thrust = false;
   this.gun = {
     firing: false,
     age: 0,
@@ -89,14 +73,12 @@ var Player = function(game, settings) {
         x: player.vel.x + 6  * forward.x,
         y: player.vel.y + 6 * forward.y
       };
-      var bulletLifespan = 60;
-      if (game.c.entities.all(Bullet).length < 20) {
+      if (game.c.entities.all(Bullet).length < 40) {
          game.c.entities.create(Bullet, { 
           size : { x:3 , y:3 }, 
           angle: player.angle,
           center: bulletCenter,
           vel: bulletVel,
-          lifespan: bulletLifespan,
           color:"red"
         });     
       }
@@ -104,52 +86,24 @@ var Player = function(game, settings) {
   };
 
   this.update = function() {
-    // update angle
-    this.angle += this.angle_vel;
-    // update x
-    if ((this.center.x + this.vel.x) >= globals.canvasWidth) {
-      this.center.x = 0;
-    } else if ((this.center.x + this.vel.x) <= 0) {
-      this.center.x = globals.canvasWidth;
-    } else {
-      this.center.x = (this.center.x + this.vel.x);
-    }
-    // update y
-    if ((this.center.y + this.vel.y) >= globals.canvasHeight) {
-      this.center.y = 0;
-    } else if ((this.center.y + this.vel.y) <= 0) {
-      this.center.y = globals.canvasHeight;
-    } else {
-      this.center.y = (this.center.y + this.vel.y);
-    }
-    // update acceleration
-    this.acc = globals.angleToVector(this.angle);
-    // update vel
-    if (this.thrust) {
-      this.vel.x += this.acc.x * 0.1;
-      this.vel.y += this.acc.y * 0.1;
-    }
-    // apply friction
-    this.vel.x *= 0.99;
-    this.vel.y *= 0.99;
-
-
     // keyhandlers
-    // if (this.c.inputter.isDown(this.c.inputter.F)) {
-    //   console.log('F');
-    // }
+    if (this.center.y < 0) {
+      this.center.y = 5;
+    } else if (this.center.y > globals.canvasHeight) {
+      this.center.y = globals.canvasHeight - 5;
+    }
+
+
     if (this.c.inputter.isDown(this.c.inputter.UP_ARROW)) {
-      this.thrust = true;
-    } else {
-      this.thrust = false;
-    }
-    if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
-      this.angle_vel -= 0.2;
-    } else if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
-      this.angle_vel += 0.2;
-    } else {
-      this.angle_vel *= 0.95;
-    }
+      if (this.center.y > 5) {
+        this.center.y -= 7.5;
+      } 
+    } 
+    if (this.c.inputter.isDown(this.c.inputter.DOWN_ARROW)) {
+      if (this.center.y < globals.canvasHeight) {
+        this.center.y += 7.5;
+      }
+    } 
     // gun handler
     if (this.gun.firing) {
       this.gun.age++;
@@ -170,7 +124,7 @@ var Player = function(game, settings) {
   };
 
   this.collision = function(other) {
-    if (other.name === 'Asteroid' || other.name === 'Wall'){
+    if (other.name === 'Asteroid'){
       this.c.entities.destroy(this);
       globals.newGame(this.c);
     }
@@ -197,20 +151,10 @@ var AsteroidGenerator = function(game, settings) {
 
   this.update = function() {
     this.age++;
-    if (!(this.age % 75)) {
+    if  (!(this.age % 100)) {
       this.asteroidCenter = {
-        x: Math.random() * globals.canvasWidth,
-        y: Math.random() * globals.canvasHeight
-      };
-      while ((globals.dist(this.asteroidCenter, this.c.entities.all(Player)[0].center)) < 150) { 
-        this.asteroidCenter = {
-          x: Math.random() * globals.canvasWidth,
-          y: Math.random() * globals.canvasHeight
-        };
-      };
-      this.asteroidVel = {
-        x: Math.random(),
-        y: Math.random()
+        x: globals.canvasWidth - 20,
+        y: globals.canvasHeight * Math.random()
       };
       this.asteroidAngle = 0;
       // Create Asteroid instance
@@ -232,30 +176,23 @@ var Asteroid = function(game, settings) {
   for (var i in settings) {
     this[i] = settings[i];
   }
-  var dice = Math.random();
-  this.angle_vel = Math.random();
-  this.angle_vel = (dice > 0.5) ? this.angle_vel : -this.angle_vel;
   this.health = 100;
-  this.lifespan = 400;
-  this.age = 0;
 
   this.update = function() { 
-    this.angle += this.angle_vel;  
+    this.center.x -= 2;
+
+    if (this.center.x <= 0) {
+      globals.score -= 100;
+      document.getElementById('score').innerHTML = globals.score;
+      this.c.entities.destroy(this);
+    }
+
     if (this.health <= 0) {
       globals.score += 90;
       document.getElementById('score').innerHTML = globals.score;
       this.c.entities.destroy(this);
     }
-    this.age++;
-    if (this.age === this.lifespan) {
-      this.c.entities.create(Wall, {
-        center: this.center,
-        size: this.size,
-        angle: this.angle,
-        angle_vel: this.angle_vel
-      });
-      this.c.entities.destroy(this);
-    }
+
   };
 
   this.draw = function(ctx) {
@@ -267,41 +204,6 @@ var Asteroid = function(game, settings) {
   };
 };
 
-// Asteroid class
-var Wall = function(game, settings) {
-  this.name = 'Wall';
-  this.c = game.c;
-  for (var i in settings) {
-    this[i] = settings[i];
-  }
-  this.color = 'purple';
-  this.health = 2000;
-
-  this.update = function() {
-    this.angle += this.angle_vel;
-    if (this.health <= 0) {
-      globals.score += 100;
-      document.getElementById('score').innerHTML = globals.score;
-      this.c.entities.destroy(this);
-    }
-    if (this.health <= 300) {
-      this.color = 'black';
-    } else {
-      this.color = 'purple';
-    }
-    this.size.x += 0.05;
-    this.size.y += 0.05;
-    this.health += 5;
-  };
-
-  this.draw = function(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.center.x - this.size.x / 2,
-                 this.center.y - this.size.y / 2,
-                 this.size.x,
-                 this.size.y);
-  };
-};
 
 // Bullet class
 var Bullet = function(game, settings) {
@@ -315,22 +217,8 @@ var Bullet = function(game, settings) {
 
   this.update = function() {
     this.age++;
-    if ((this.center.x + this.vel.x) >= globals.canvasWidth) {
-      this.center.x = 0;
-    } else if ((this.center.x + this.vel.x) <= 0) {
-      this.center.x = globals.canvasWidth;
-    } else {
-      this.center.x = (this.center.x + this.vel.x);
-    }
-    // update y
-    if ((this.center.y + this.vel.y) >= globals.canvasHeight) {
-      this.center.y = 0;
-    } else if ((this.center.y + this.vel.y) <= 0) {
-      this.center.y = globals.canvasHeight;
-    } else {
-      this.center.y = (this.center.y + this.vel.y);
-    }
-    if (this.age === this.lifespan) {
+    this.center.x += 6;
+    if (this.center.x >= globals.canvasWidth) {
       this.c.entities.destroy(this);
     }
 
@@ -339,7 +227,7 @@ var Bullet = function(game, settings) {
   this.collision = function(other) {
     if (other.name === 'Player') {
       this.c.entities.destroy(this);
-    } else if (other.name === 'Asteroid' || other.name === 'Wall'){
+    } else if (other.name === 'Asteroid'){
       other.health -= 100;
       globals.score += 10;
       document.getElementById('score').innerHTML = globals.score;
