@@ -147,21 +147,23 @@ var Player = function(game, settings) {
       }
     } 
     // gun handler
-    // if (this.gun.firing) {
+    if (this.gun.firing) {
       this.gun.age++;
-      // if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
+      if (this.c.inputter.isDown(this.c.inputter.SPACE) ||
+        this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE)) {
         if (!(this.gun.age % 10)) {
           this.gun.shoot(this);
         }
-    //   } else {
-    //     this.gun.firing = false;
-    //     this.gun.age = 0;
-    //   }
-    // } else if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
-    //   this.gun.firing = true;
-    //   this.gun.age = 0;
-    //   this.gun.shoot(this);
-    // }
+      } else {
+        this.gun.firing = false;
+        this.gun.age = 0;
+      }
+    } else if (this.c.inputter.isDown(this.c.inputter.SPACE) ||
+      this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE)) {
+      this.gun.firing = true;
+      this.gun.age = 0;
+      this.gun.shoot(this);
+    }
 
   };
 
