@@ -79,6 +79,7 @@ var Player = function(game, settings) {
           angle: player.angle,
           center: bulletCenter,
           vel: bulletVel,
+          type: "Player",
           color:"red"
         });     
       }
@@ -92,23 +93,31 @@ var Player = function(game, settings) {
     } else if (this.center.y > globals.canvasHeight) {
       this.center.y = globals.canvasHeight - 5;
     }
-
-
     if (this.c.inputter.isDown(this.c.inputter.UP_ARROW)) {
       if (this.center.y > 5) {
-        this.center.y -= 7.5;
+        this.center.y -= 5;
       } 
     } 
     if (this.c.inputter.isDown(this.c.inputter.DOWN_ARROW)) {
       if (this.center.y < globals.canvasHeight) {
-        this.center.y += 7.5;
+        this.center.y += 5;
+      }
+    } 
+    if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
+      if (this.center.x > 5) {
+        this.center.x -= 5;
+      } 
+    } 
+    if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
+      if (this.center.x < globals.canvasHeight) {
+        this.center.x += 5;
       }
     } 
     // gun handler
     if (this.gun.firing) {
       this.gun.age++;
       if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
-        if (!(this.gun.age % 20)) {
+        if (!(this.gun.age % 10)) {
           this.gun.shoot(this);
         }
       } else {
@@ -124,11 +133,10 @@ var Player = function(game, settings) {
   };
 
   this.collision = function(other) {
-    if (other.name === 'Asteroid'){
+    if (other.name === 'Asteroid' || other.name === 'Bullet' && other.type === 'Enemy'){
       this.c.entities.destroy(this);
       globals.newGame(this.c);
     }
-
   };
 
   this.draw = function(ctx) {
@@ -148,15 +156,18 @@ var AsteroidGenerator = function(game, settings) {
     this[i] = settings[i];
   }
   this.age = 0;
-
   this.update = function() {
     this.age++;
-    if  (!(this.age % 100)) {
+    if  (!(this.age % 200)) {
       this.asteroidCenter = {
         x: globals.canvasWidth - 20,
         y: globals.canvasHeight * Math.random()
       };
-      this.asteroidAngle = 0;
+      this.asteroidVel = {
+        x: -1,
+        y: 0
+      };
+      this.asteroidAngle = 180;
       // Create Asteroid instance
       this.c.entities.create(Asteroid, { 
         center: this.asteroidCenter,
@@ -176,23 +187,52 @@ var Asteroid = function(game, settings) {
   for (var i in settings) {
     this[i] = settings[i];
   }
-  this.health = 100;
+  this.health = 200;
+  var dice = Math.random();
+  this.angle_vel = Math.random();
+  this.angle_vel = (dice > 0.5) ? this.angle_vel : -this.angle_vel;
+  this.gun = {
+    age: 0,
+    shoot: function(shooter) {
+      var forward = globals.angleToVector(shooter.angle);     
+      var bulletCenter = {
+        x: shooter.center.x + 15 * forward.x,
+        y: shooter.center.y + 15 * forward.y
+      };
+      var bulletVel = {
+        x: 6 * forward.x,
+        y: 6 * forward.y
+      };
+      if (game.c.entities.all(Bullet).length < 40) {
+         game.c.entities.create(Bullet, { 
+          size : { x:3 , y:3 }, 
+          angle: shooter.angle,
+          center: bulletCenter,
+          vel: bulletVel,
+          type: "Enemy",
+          color:"black"
+        });     
+      }
+    }
+  };
 
   this.update = function() { 
-    this.center.x -= 2;
-
+    this.center.x -=2
+    this.angle += this.angle_vel;
     if (this.center.x <= 0) {
       globals.score -= 100;
       document.getElementById('score').innerHTML = globals.score;
       this.c.entities.destroy(this);
     }
-
     if (this.health <= 0) {
       globals.score += 90;
       document.getElementById('score').innerHTML = globals.score;
       this.c.entities.destroy(this);
     }
-
+    this.gun.age++;
+    if (!(this.gun.age % 40)) {
+      this.gun.shoot(this);
+    }
   };
 
   this.draw = function(ctx) {
@@ -217,21 +257,26 @@ var Bullet = function(game, settings) {
 
   this.update = function() {
     this.age++;
-    this.center.x += 6;
-    if (this.center.x >= globals.canvasWidth) {
+    this.center.x += this.vel.x;
+    this.center.y += this.vel.y;
+    if (this.center.x >= globals.canvasWidth || 
+        this.center.x <= 0 ||
+        this.center.y >= globals.canvasHeight ||
+        this.center.y <= 0) {
       this.c.entities.destroy(this);
     }
 
   };
 
   this.collision = function(other) {
-    if (other.name === 'Player') {
-      this.c.entities.destroy(this);
-    } else if (other.name === 'Asteroid'){
+    if (other.name === 'Asteroid' && this.type !== 'Enemy'){
       other.health -= 100;
       globals.score += 10;
       document.getElementById('score').innerHTML = globals.score;
       this.c.entities.destroy(this);
+    } else if (other.name === 'Player' && this.type === 'Enemy') {
+      this.c.entities.destroy(this);
+      this.c.entities.destroy(other);
     }
 
   };
