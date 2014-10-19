@@ -35,7 +35,6 @@ var globals = {
     }
     globals.score = 0;
     globals.message.txt = "Score: " + globals.score;
-
     // Create Player instance
     c.entities.create(Player, {
       center: {
@@ -53,7 +52,7 @@ var globals = {
     }
     globals.message.txt = "Winner! Score: " + globals.score;
     globals.message.pos.x = globals.canvasWidth/2;
-    globals.message.pos.y = globals.canvasHeight/2;
+    globals.message.pos.y = globals.canvasHeight/2;    
   }
 };
 
@@ -224,7 +223,7 @@ var EnemyGenerator = function(game, settings) {
       },
       angle: (Math.random() > 0.5) ? 215 : 145,
       angle_vel: 0.2,
-      health: 100,
+      health: 400,
       size: { x:20 , y:20 },
       color: 'magenta',
       gun: {
@@ -265,7 +264,7 @@ var EnemyGenerator = function(game, settings) {
       },
       angle: 180,
       angle_vel: 0.1,
-      health: 3000,
+      health: 4000,
       size: { x:150 , y:150 },
       color: 'red',
       gun: {
@@ -465,6 +464,7 @@ var Boss = function(game, settings) {
     }
 
     if (this.health <= 0) {
+      globals.score += 350;
       globals.winGame(this.c);
     }
     this.gun.age++;
@@ -508,10 +508,13 @@ var Enemy = function(game, settings) {
     this.angle += this.angle_vel;
     if (this.center.x <= 0) {
       globals.score -= 100;
+      globals.message.txt = "Score: " + globals.score;
       this.c.entities.destroy(this);
     }
     if (this.health <= 0) {
+      console.log('ping');
       globals.score += 90;
+      globals.message.txt = "Score: " + globals.score;
       this.c.entities.destroy(this);
     }
     this.gun.age++;
