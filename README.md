@@ -6,7 +6,9 @@ http://coquette.maryrosecook.com/
 
 **gameplay:**
 
-use the arrow keys to move and the space bar to shoot.
+click the left mouse button to move and shoot.
+
+or, use the arrow keys to move and the space bar to shoot.
 
 shoot the asteroids and get points.
 
