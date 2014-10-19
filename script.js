@@ -1,3 +1,11 @@
+// NOTES
+// next steps:
+// powerups - different weapons
+// enemy paths
+// level generator
+// boss fight
+
+
 // Create Game globals
 var globals = {
   bulletSpeed: 2,
@@ -60,6 +68,7 @@ var Player = function(game, settings) {
   };
   this.color = "blue";
   this.angle = 0;
+  this.mousePos = {};
   this.gun = {
     firing: false,
     age: 0,
@@ -70,9 +79,9 @@ var Player = function(game, settings) {
         y: player.center.y + 15 * forward.y
       };
       var bulletVel = {
-        x: player.vel.x + 6  * forward.x,
-        y: player.vel.y + 6 * forward.y
-      };
+        x: 6 * forward.x,
+        y: 6 * forward.y
+      }
       if (game.c.entities.all(Bullet).length < 40) {
          game.c.entities.create(Bullet, { 
           size : { x:3 , y:3 }, 
@@ -87,12 +96,36 @@ var Player = function(game, settings) {
   };
 
   this.update = function() {
+
+    if (this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE) && this.center !== this.mousePos) {
+      this.mousePos = this.c.inputter.getMousePosition();
+      var slope = (this.mousePos.y - this.center.y) / (this.mousePos.x - this.center.x);
+      var arctan = Math.atan(slope) * (180/Math.PI);
+      var forward = 0;
+      if (this.mousePos.x <= this.center.x) {
+        forward = globals.angleToVector(arctan + 180);
+      } else {
+        forward = globals.angleToVector(arctan);
+      }
+      this.vel.x = 5 * forward.x;
+      this.vel.y = 5 * forward.y;
+      this.center.x += this.vel.x;
+      this.center.y += this.vel.y;
+      if (this.center.y > 5) {
+        this.center.y -= 5;
+      } 
+      if (this.center.y < globals.canvasHeight) {
+        this.center.y += 5;
+      }
+      if (this.center.x > 5) {
+        this.center.x -= 5;
+      } 
+      if (this.center.x < globals.canvasWidth) {
+        this.center.x += 5;
+      }
+      console.log()
+    };    
     // keyhandlers
-    if (this.center.y < 0) {
-      this.center.y = 5;
-    } else if (this.center.y > globals.canvasHeight) {
-      this.center.y = globals.canvasHeight - 5;
-    }
     if (this.c.inputter.isDown(this.c.inputter.UP_ARROW)) {
       if (this.center.y > 5) {
         this.center.y -= 5;
@@ -109,26 +142,26 @@ var Player = function(game, settings) {
       } 
     } 
     if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
-      if (this.center.x < globals.canvasHeight) {
+      if (this.center.x < globals.canvasWidth) {
         this.center.x += 5;
       }
     } 
     // gun handler
-    if (this.gun.firing) {
+    // if (this.gun.firing) {
       this.gun.age++;
-      if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
+      // if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
         if (!(this.gun.age % 10)) {
           this.gun.shoot(this);
         }
-      } else {
-        this.gun.firing = false;
-        this.gun.age = 0;
-      }
-    } else if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
-      this.gun.firing = true;
-      this.gun.age = 0;
-      this.gun.shoot(this);
-    }
+    //   } else {
+    //     this.gun.firing = false;
+    //     this.gun.age = 0;
+    //   }
+    // } else if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
+    //   this.gun.firing = true;
+    //   this.gun.age = 0;
+    //   this.gun.shoot(this);
+    // }
 
   };
 
@@ -158,7 +191,7 @@ var AsteroidGenerator = function(game, settings) {
   this.age = 0;
   this.update = function() {
     this.age++;
-    if  (!(this.age % 200)) {
+    if  (!(this.age % 100)) {
       this.asteroidCenter = {
         x: globals.canvasWidth - 20,
         y: globals.canvasHeight * Math.random()
@@ -230,7 +263,7 @@ var Asteroid = function(game, settings) {
       this.c.entities.destroy(this);
     }
     this.gun.age++;
-    if (!(this.gun.age % 40)) {
+    if (!(this.gun.age % 20)) {
       this.gun.shoot(this);
     }
   };
