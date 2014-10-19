@@ -1,7 +1,6 @@
 // NOTES
 // next steps:
 // powerups - different weapons
-// enemy paths
 // level generator
 // boss fight
 
@@ -191,23 +190,28 @@ var AsteroidGenerator = function(game, settings) {
     this[i] = settings[i];
   }
   this.age = 0;
+
   this.update = function() {
     this.age++;
     if  (!(this.age % 100)) {
-      this.asteroidCenter = {
-        x: globals.canvasWidth - 20,
-        y: globals.canvasHeight * Math.random()
+      var asteroidCenter = {
+        x: globals.canvasWidth,
+        y: Math.round(globals.canvasHeight * Math.random())
       };
-      this.asteroidVel = {
+      var asteroidPath = {
+        x: Math.round((globals.canvasWidth-400) * Math.random()) + 400,
+        y: Math.round(Math.random() * globals.canvasHeight)
+      };
+      var asteroidVel = {
         x: -1,
         y: 0
       };
-      this.asteroidAngle = 180;
       // Create Asteroid instance
       this.c.entities.create(Asteroid, { 
-        center: this.asteroidCenter,
-        vel: this.asteroidVel,
-        angle: this.asteroidAngle,
+        center: asteroidCenter,
+        vel: asteroidVel,
+        angle: 180,
+        path: asteroidPath,
         health: 300,
         size : { x:20 , y:20 }, 
         color:'magenta'
@@ -251,8 +255,17 @@ var Asteroid = function(game, settings) {
     }
   };
 
-  this.update = function() { 
-    this.center.x -=2
+  this.update = function() {
+    if (this.center.x > this.path.x) {
+      this.center.x -=2;
+    } else if (this.center.y === this.path.y) {
+      this.center.x -=2;
+    } else if (this.center.y < this.path.y) {
+      this.center.y +=1;
+    } else if (this.center.y > this.path.y) {
+      this.center.y -=1;
+    } 
+    
     this.angle += this.angle_vel;
     if (this.center.x <= 0) {
       globals.score -= 100;
