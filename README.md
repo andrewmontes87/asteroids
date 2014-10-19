@@ -16,6 +16,8 @@ if the asteroids get past you, you lose points.
 
 if you get shot or hit an asteroid you die and the game starts over.
 
+kill the boss to win the game!
+
 **demo:**
 
 http://andrewmontes.com/shmup/
