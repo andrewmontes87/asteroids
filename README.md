@@ -6,13 +6,13 @@ http://coquette.maryrosecook.com/
 
 **gameplay:**
 
-use the arrow keys to move up and down and the space bar to shoot.
+use the arrow keys to move and the space bar to shoot.
 
-use your ship to shoot the asteroids and get points.
+shoot the asteroids and get points.
 
 if the asteroids get past you, you lose points.
 
-if you hit an asteroids you die the game starts over.
+if you get shot or hit an asteroid you die and the game starts over.
 
 **demo:**
 
