@@ -208,6 +208,7 @@ var AsteroidGenerator = function(game, settings) {
         center: this.asteroidCenter,
         vel: this.asteroidVel,
         angle: this.asteroidAngle,
+        health: 300,
         size : { x:20 , y:20 }, 
         color:'magenta'
       });
@@ -222,7 +223,6 @@ var Asteroid = function(game, settings) {
   for (var i in settings) {
     this[i] = settings[i];
   }
-  this.health = 200;
   var dice = Math.random();
   this.angle_vel = Math.random();
   this.angle_vel = (dice > 0.5) ? this.angle_vel : -this.angle_vel;
