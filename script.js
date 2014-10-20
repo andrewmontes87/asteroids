@@ -49,7 +49,17 @@ var globals = {
     }
     globals.message.txt = "Winner! Score: " + globals.score;
     globals.message.pos.x = globals.canvasWidth/2;
-    globals.message.pos.y = globals.canvasHeight/2;    
+    globals.message.pos.y = globals.canvasHeight/2;
+    // c.entities.create(Button, {
+    //   size: {
+    //     x: 80,
+    //     y: 40
+    //   },
+    //   center: {
+    //     x: globals.canvasWidth/2 - size.x/2,
+    //     y: globals.canvasHeight/2 - size.y/2
+    //   }
+    // });    
   }
 };
 
@@ -572,6 +582,36 @@ var Bullet = function(game, settings) {
                  this.size.x,
                  this.size.y);
   };
+};
+
+// Restart button
+var Button = function(game, settings) {
+  this.c = game.c;
+  for (var i in settings) {
+    this[i] = settings[i];
+  }
+
+  this.update = function() {
+    if (this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE)) {
+      this.mousePos = this.c.inputter.getMousePosition();
+      if (this.mousePos.x < this.center.x + this.size.x/2 && 
+          this.mousePos.x > this.center.x - this.size.x/2 &&
+          this.mousePos.y < this.center.y + this.size.y/2 && 
+          this.mousePos.y > this.center.y - this.size.y/2) {
+        console.log('hello');
+      }
+
+    }
+  }
+
+  this.draw = function (ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.center.x - this.size.x / 2,
+                 this.center.y - this.size.y / 2,
+                 this.size.x,
+                 this.size.y);
+  }
+
 };
 
 // Start the game
