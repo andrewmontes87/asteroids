@@ -1,9 +1,6 @@
 // NOTES
 // next steps:
 // powerups - different weapons
-// level generator
-// boss fight
-
 
 // Create Game globals
 var globals = {
@@ -127,37 +124,37 @@ var Player = function(game, settings) {
       this.vel.y = 5 * forward.y;
       this.center.x += this.vel.x;
       this.center.y += this.vel.y;
-      if (this.center.y > 5) {
+      if (this.center.y >= this.size.y) {
         this.center.y -= 5;
       } 
-      if (this.center.y < globals.canvasHeight) {
+      if (this.center.y <= (globals.canvasHeight - this.size.x)) {
         this.center.y += 5;
       }
-      if (this.center.x > 5) {
+      if (this.center.x >= this.size.x) {
         this.center.x -= 5;
       } 
-      if (this.center.x < globals.canvasWidth) {
+      if (this.center.x <= (globals.canvasWidth - this.size.y)) {
         this.center.x += 5;
       }
     }    
     // keyhandlers
     if (this.c.inputter.isDown(this.c.inputter.UP_ARROW)) {
-      if (this.center.y > 5) {
+      if (this.center.y >= this.size.y) {
         this.center.y -= 5;
       } 
     } 
     if (this.c.inputter.isDown(this.c.inputter.DOWN_ARROW)) {
-      if (this.center.y < globals.canvasHeight) {
+      if (this.center.y <= (globals.canvasHeight - this.size.x)) {
         this.center.y += 5;
       }
     } 
     if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
-      if (this.center.x > 5) {
+      if (this.center.x >= this.size.x) {
         this.center.x -= 5;
       } 
     } 
     if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
-      if (this.center.x < globals.canvasWidth) {
+      if (this.center.x <= (globals.canvasWidth - this.size.y)) {
         this.center.x += 5;
       }
     } 
