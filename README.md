@@ -24,8 +24,13 @@ http://andrewmontes.com/shmup/
 
 
 
+### Deploy
 
-asteroids
+Move index.html, script.js, and coquette.js to your FTP destination
+
+
+
+asteroids - a different version of the same game
 =========
 
 gameplay:
